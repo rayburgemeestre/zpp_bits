@@ -263,63 +263,63 @@ struct access
     }
 #endif
 
-    constexpr static auto try_serialize(auto && item)
+    constexpr static auto try_serialize2(auto && item)
     {
-        if constexpr (requires { serialize(item); }) {
-            return serialize(item);
+        if constexpr (requires { serialize2(item); }) {
+            return serialize2(item);
         }
     }
 
     template <typename Type, typename Archive>
-    constexpr static auto has_serialize()
+    constexpr static auto has_serialize2()
     {
         return requires {
                    requires std::same_as<
-                       typename std::remove_cvref_t<Type>::serialize,
+                       typename std::remove_cvref_t<Type>::serialize2,
                        members<
-                           std::remove_cvref_t<Type>::serialize::value>>;
+                           std::remove_cvref_t<Type>::serialize2::value>>;
                } ||
                requires(Type && item) {
                    requires std::same_as<
-                       std::remove_cvref_t<decltype(try_serialize(
+                       std::remove_cvref_t<decltype(try_serialize2(
                            item))>,
                        members<std::remove_cvref_t<
-                           decltype(try_serialize(item))>::value>>;
+                           decltype(try_serialize2(item))>::value>>;
                } ||
                requires {
                    requires std::same_as<
-                       typename std::remove_cvref_t<Type>::serialize,
+                       typename std::remove_cvref_t<Type>::serialize2,
                        protocol<
-                           std::remove_cvref_t<Type>::serialize::value,
-                           std::remove_cvref_t<Type>::serialize::members>>;
+                           std::remove_cvref_t<Type>::serialize2::value,
+                           std::remove_cvref_t<Type>::serialize2::members>>;
                } ||
                requires(Type && item) {
                    requires std::same_as<
-                       std::remove_cvref_t<decltype(try_serialize(
+                       std::remove_cvref_t<decltype(try_serialize2(
                            item))>,
                        protocol<
-                           std::remove_cvref_t<decltype(try_serialize(
+                           std::remove_cvref_t<decltype(try_serialize2(
                                item))>::value,
-                           std::remove_cvref_t<decltype(try_serialize(
+                           std::remove_cvref_t<decltype(try_serialize2(
                                item))>::members>>;
                } ||
                requires(Type && item, Archive && archive) {
-                   std::remove_cvref_t<Type>::serialize(archive, item);
+                   std::remove_cvref_t<Type>::serialize2(archive, item);
                } || requires(Type && item, Archive && archive) {
-                        serialize(archive, item);
+                        serialize2(archive, item);
                     };
     }
 
     template <typename Type, typename Archive>
-    constexpr static auto has_explicit_serialize()
+    constexpr static auto has_explicit_serialize2()
     {
         return requires(Type && item, Archive && archive)
         {
-            std::remove_cvref_t<Type>::serialize(archive, item);
+            std::remove_cvref_t<Type>::serialize2(archive, item);
         }
         || requires(Type && item, Archive && archive)
         {
-            serialize(archive, item);
+            serialize2(archive, item);
         };
     }
 
@@ -347,17 +347,17 @@ struct access
         return requires
         {
             requires std::same_as<
-                typename std::remove_cvref_t<Type>::serialize,
-                protocol<std::remove_cvref_t<Type>::serialize::value,
-                         std::remove_cvref_t<Type>::serialize::members>>;
+                typename std::remove_cvref_t<Type>::serialize2,
+                protocol<std::remove_cvref_t<Type>::serialize2::value,
+                         std::remove_cvref_t<Type>::serialize2::members>>;
         }
         || requires(Type && item)
         {
             requires std::same_as<
-                std::remove_cvref_t<decltype(try_serialize(item))>,
+                std::remove_cvref_t<decltype(try_serialize2(item))>,
                 protocol<
-                    std::remove_cvref_t<decltype(try_serialize(item))>::value,
-                    std::remove_cvref_t<decltype(try_serialize(
+                    std::remove_cvref_t<decltype(try_serialize2(item))>::value,
+                    std::remove_cvref_t<decltype(try_serialize2(
                         item))>::members>>;
         };
     }
@@ -368,22 +368,22 @@ struct access
         if constexpr (
             requires {
                 requires std::same_as<
-                    typename std::remove_cvref_t<Type>::serialize,
+                    typename std::remove_cvref_t<Type>::serialize2,
                     protocol<
-                        std::remove_cvref_t<Type>::serialize::value,
-                        std::remove_cvref_t<Type>::serialize::members>>;
+                        std::remove_cvref_t<Type>::serialize2::value,
+                        std::remove_cvref_t<Type>::serialize2::members>>;
             }) {
-            return std::remove_cvref_t<Type>::serialize::value;
+            return std::remove_cvref_t<Type>::serialize2::value;
         } else if constexpr (
             requires(Type && item) {
                 requires std::same_as<
-                    std::remove_cvref_t<decltype(try_serialize(item))>,
-                    protocol<std::remove_cvref_t<decltype(try_serialize(
+                    std::remove_cvref_t<decltype(try_serialize2(item))>,
+                    protocol<std::remove_cvref_t<decltype(try_serialize2(
                                  item))>::value,
-                             std::remove_cvref_t<decltype(try_serialize(
+                             std::remove_cvref_t<decltype(try_serialize2(
                                  item))>::members>>;
             }) {
-            return std::remove_cvref_t<decltype(try_serialize(
+            return std::remove_cvref_t<decltype(try_serialize2(
                 std::declval<Type>()))>::value;
         } else {
             static_assert(!sizeof(Type));
@@ -446,18 +446,18 @@ struct variant_impl<Variant<Types...>>
             if constexpr (requires {
                               requires std::same_as<
                                   serialization_id<
-                                      FirstType::serialize_id::value>,
-                              typename FirstType::serialize_id>;
+                                      FirstType::serialize2_id::value>,
+                              typename FirstType::serialize2_id>;
                           }) {
-                return FirstType::serialize_id::value;
+                return FirstType::serialize2_id::value;
             } else if constexpr (
                 requires {
                     requires std::same_as<
-                        serialization_id<decltype(serialize_id(
+                        serialization_id<decltype(serialize2_id(
                             std::declval<FirstType>()))::value>,
-                    decltype(serialize_id(std::declval<FirstType>()))>;
+                    decltype(serialize2_id(std::declval<FirstType>()))>;
                 }) {
-                return decltype(serialize_id(
+                return decltype(serialize2_id(
                     std::declval<FirstType>()))::value;
             } else {
                 return std::byte{Index};
@@ -623,13 +623,13 @@ struct visitor
     }
 
     template <typename...>
-    constexpr auto serialize_one(auto && ... arguments) const
+    constexpr auto serialize2_one(auto && ... arguments) const
     {
         return (*this)(std::forward<decltype(arguments)>(arguments)...);
     }
 
     template <typename...>
-    constexpr auto serialize_many(auto && ... arguments) const
+    constexpr auto serialize2_many(auto && ... arguments) const
     {
         return (*this)(std::forward<decltype(arguments)>(arguments)...);
     }
@@ -745,7 +745,7 @@ using underlying_type_t = decltype(underlying_type_generic<Type>());
 template <typename Id>
 struct id_serializable
 {
-    using serialize_id = Id;
+    using serialize2_id = Id;
 };
 
 constexpr auto unique(auto && ... values)
@@ -775,24 +775,24 @@ concept byte_view = byte_type<typename std::remove_cvref_t<Type>::value_type> &&
 };
 
 template <typename Type>
-concept has_serialize =
-    access::has_serialize<Type,
+concept has_serialize2 =
+    access::has_serialize2<Type,
                           traits::visitor<std::remove_cvref_t<Type>>>();
 
 template <typename Type>
-concept has_explicit_serialize = access::has_explicit_serialize<
+concept has_explicit_serialize2 = access::has_explicit_serialize2<
     Type,
     traits::visitor<std::remove_cvref_t<Type>>>();
 
 template <typename Type>
-concept variant = !has_serialize<Type> && requires (Type variant) {
+concept variant = !has_serialize2<Type> && requires (Type variant) {
     variant.index();
     std::get_if<0>(&variant);
     std::variant_size_v<std::remove_cvref_t<Type>>;
 };
 
 template <typename Type>
-concept optional = !has_serialize<Type> && requires (Type optional) {
+concept optional = !has_serialize2<Type> && requires (Type optional) {
     optional.value();
     optional.has_value();
     optional.operator bool();
@@ -801,7 +801,7 @@ concept optional = !has_serialize<Type> && requires (Type optional) {
 
 template <typename Type>
 concept container =
-    !has_serialize<Type> && !optional<Type> && requires(Type container)
+    !has_serialize2<Type> && !optional<Type> && requires(Type container)
 {
     typename std::remove_cvref_t<Type>::value_type;
     container.size();
@@ -816,7 +816,7 @@ concept associative_container = container<Type> && requires(Type container)
 };
 
 template <typename Type>
-concept tuple = !has_serialize<Type> && !container<Type> && requires(Type tuple)
+concept tuple = !has_serialize2<Type> && !container<Type> && requires(Type tuple)
 {
     sizeof(std::tuple_size<std::remove_cvref_t<Type>>);
 }
@@ -832,7 +832,7 @@ concept owning_pointer = !optional<Type> &&
 
 template <typename Type>
 concept bitset =
-    !has_serialize<Type> && requires(std::remove_cvref_t<Type> bitset)
+    !has_serialize2<Type> && requires(std::remove_cvref_t<Type> bitset)
 {
     bitset.flip();
     bitset.set();
@@ -844,7 +844,7 @@ template <typename Type>
 concept has_protocol = access::has_protocol<Type>();
 
 template <typename Type>
-concept by_protocol = has_protocol<Type> && !has_explicit_serialize<Type>;
+concept by_protocol = has_protocol<Type> && !has_explicit_serialize2<Type>;
 
 template <typename Type>
 concept basic_array = std::is_array_v<std::remove_cvref_t<Type>>;
@@ -876,7 +876,7 @@ concept endian_aware_archive = requires
 };
 
 template <typename Archive, typename Type>
-concept serialize_as_bytes = endian_independent_byte_serializable<Type> ||
+concept serialize2_as_bytes = endian_independent_byte_serializable<Type> ||
     (!endian_aware_archive<Archive> && byte_serializable<Type>);
 
 template <typename Type, typename Reference>
@@ -1186,46 +1186,46 @@ constexpr auto access::number_of_members()
         return std::tuple_size_v<type>;
     } else if constexpr (requires {
                              requires std::same_as<
-                                 typename type::serialize,
-                                 members<type::serialize::value>>;
-                             requires type::serialize::value !=
+                                 typename type::serialize2,
+                                 members<type::serialize2::value>>;
+                             requires type::serialize2::value !=
                                  std::numeric_limits<
                                      std::size_t>::max();
                          }) {
-        return type::serialize::value;
+        return type::serialize2::value;
     } else if constexpr (requires(Type && item) {
                              requires std::same_as<
-                                 decltype(try_serialize(item)),
-                                 members<decltype(try_serialize(
+                                 decltype(try_serialize2(item)),
+                                 members<decltype(try_serialize2(
                                      item))::value>>;
-                             requires decltype(try_serialize(
+                             requires decltype(try_serialize2(
                                  item))::value !=
                                  std::numeric_limits<
                                      std::size_t>::max();
                          }) {
-        return decltype(serialize(std::declval<type>()))::value;
+        return decltype(serialize2(std::declval<type>()))::value;
     } else if constexpr (requires {
                              requires std::same_as<
-                                 typename type::serialize,
-                                 protocol<type::serialize::value,
-                                          type::serialize::members>>;
-                             requires type::serialize::members !=
+                                 typename type::serialize2,
+                                 protocol<type::serialize2::value,
+                                          type::serialize2::members>>;
+                             requires type::serialize2::members !=
                                  std::numeric_limits<
                                      std::size_t>::max();
                          }) {
-        return type::serialize::members;
+        return type::serialize2::members;
     } else if constexpr (requires(Type && item) {
                              requires std::same_as<
-                                 decltype(try_serialize(item)),
-                                 protocol<decltype(try_serialize(item))::value,
-                                          decltype(try_serialize(
+                                 decltype(try_serialize2(item)),
+                                 protocol<decltype(try_serialize2(item))::value,
+                                          decltype(try_serialize2(
                                               item))::members>>;
-                             requires decltype(try_serialize(
+                             requires decltype(try_serialize2(
                                  item))::members !=
                                  std::numeric_limits<
                                      std::size_t>::max();
                          }) {
-        return decltype(serialize(std::declval<type>()))::members;
+        return decltype(serialize2(std::declval<type>()))::members;
 #if __cpp_structured_bindings >= 202411L
 #if (__cplusplus < 202600L) && (defined __clang__)
 #pragma clang diagnostic push
@@ -1276,7 +1276,7 @@ struct access::byte_serializable_visitor
 
         if constexpr (concepts::empty<type>) {
             return std::false_type{};
-        } else if constexpr ((... || has_explicit_serialize<
+        } else if constexpr ((... || has_explicit_serialize2<
                                          Types,
                                          traits::visitor<Types>>())) {
             return std::false_type{};
@@ -1302,7 +1302,7 @@ constexpr auto access::byte_serializable()
         return false;
     } else if constexpr (!std::is_trivially_copyable_v<type>) {
         return false;
-    } else if constexpr (has_explicit_serialize<type,
+    } else if constexpr (has_explicit_serialize2<type,
                                                 traits::visitor<type>>()) {
         return false;
     } else if constexpr (
@@ -1336,7 +1336,7 @@ struct access::endian_independent_byte_serializable_visitor
 
         if constexpr (concepts::empty<type>) {
             return std::false_type{};
-        } else if constexpr ((... || has_explicit_serialize<
+        } else if constexpr ((... || has_explicit_serialize2<
                                          Types,
                                          traits::visitor<Types>>())) {
             return std::false_type{};
@@ -1364,7 +1364,7 @@ constexpr auto access::endian_independent_byte_serializable()
         return false;
     } else if constexpr (!std::is_trivially_copyable_v<type>) {
         return false;
-    } else if constexpr (has_explicit_serialize<type,
+    } else if constexpr (has_explicit_serialize2<type,
                                                 traits::visitor<type>>()) {
         return false;
     } else if constexpr (
@@ -1427,7 +1427,7 @@ constexpr auto access::self_referencing()
 
     if constexpr (members_count < 0) {
         return false;
-    } else if constexpr (has_explicit_serialize<type,
+    } else if constexpr (has_explicit_serialize2<type,
                                                 traits::visitor<type>>()) {
         return false;
     } else if constexpr (members_count == 0) {
@@ -1478,7 +1478,7 @@ template <typename Type, typename...>
 optional_ptr(Type *) -> optional_ptr<Type>;
 
 template <typename Archive, typename Type>
-ZPP_BITS_INLINE constexpr static auto serialize(
+ZPP_BITS_INLINE constexpr static auto serialize2(
     Archive & archive,
     const optional_ptr<Type> & self) requires(Archive::kind() == kind::out)
 {
@@ -1491,7 +1491,7 @@ ZPP_BITS_INLINE constexpr static auto serialize(
 
 template <typename Archive, typename Type>
 ZPP_BITS_INLINE constexpr static auto
-serialize(Archive & archive,
+serialize2(Archive & archive,
           optional_ptr<Type> & self) requires(Archive::kind() == kind::in)
 {
     std::byte has_value{};
@@ -1531,21 +1531,21 @@ struct sized_item : public Type
     {
     }
 
-    ZPP_BITS_INLINE constexpr static auto serialize(auto & archive,
+    ZPP_BITS_INLINE constexpr static auto serialize2(auto & archive,
                                                     auto & self)
     {
         if constexpr (std::remove_cvref_t<decltype(archive)>::kind() == kind::out) {
-            return archive.template serialize_one<SizeType>(
+            return archive.template serialize2_one<SizeType>(
                 static_cast<const Type &>(self));
         } else {
-            return archive.template serialize_one<SizeType>(
+            return archive.template serialize2_one<SizeType>(
                 static_cast<Type &>(self));
         }
     }
 };
 
 template <typename Type, typename SizeType>
-auto serialize(const sized_item<Type, SizeType> &)
+auto serialize2(const sized_item<Type, SizeType> &)
     -> members<number_of_members<Type>()>;
 
 template <typename Type, typename SizeType>
@@ -1562,10 +1562,10 @@ struct sized_item_ref
     {
     }
 
-    ZPP_BITS_INLINE constexpr static auto serialize(auto & serializer,
+    ZPP_BITS_INLINE constexpr static auto serialize2(auto & serialize2r,
                                                     auto & self)
     {
-        return serializer.template serialize_one<SizeType>(self.value);
+        return serialize2r.template serialize2_one<SizeType>(self.value);
     }
 
     Type && value;
@@ -1657,7 +1657,7 @@ ZPP_BITS_INLINE constexpr auto varint_size(auto value)
 }
 
 template <typename Archive, typename Type, varint_encoding Encoding>
-ZPP_BITS_INLINE constexpr auto serialize(
+ZPP_BITS_INLINE constexpr auto serialize2(
     Archive & archive,
     varint<Type, Encoding> self) requires(Archive::kind() == kind::out)
 {
@@ -1743,7 +1743,7 @@ constexpr auto decode_varint(auto data, auto & value, auto & position)
 }
 
 template <typename Archive, typename Type, varint_encoding Encoding>
-ZPP_BITS_INLINE constexpr auto serialize(
+ZPP_BITS_INLINE constexpr auto serialize2(
     Archive & archive,
     varint<Type, Encoding> & self) requires(Archive::kind() == kind::in)
 {
@@ -1834,7 +1834,7 @@ ZPP_BITS_INLINE constexpr auto serialize(
 
 template <typename Archive, typename Type, varint_encoding Encoding>
 constexpr auto
-serialize(Archive & archive,
+serialize2(Archive & archive,
           varint<Type, Encoding> && self) requires(Archive::kind() ==
                                                    kind::in) = delete;
 
@@ -1924,7 +1924,7 @@ public:
 
     ZPP_BITS_INLINE constexpr auto operator()(auto &&... items)
     {
-        return serialize_many(items...);
+        return serialize2_many(items...);
     }
 
     constexpr decltype(auto) data()
@@ -2002,18 +2002,18 @@ public:
     }
 
 protected:
-    ZPP_BITS_INLINE constexpr errc serialize_many(auto && first_item,
+    ZPP_BITS_INLINE constexpr errc serialize2_many(auto && first_item,
                                                   auto &&... items)
     {
-        if (auto result = serialize_one(first_item); failure(result))
+        if (auto result = serialize2_one(first_item); failure(result))
             [[unlikely]] {
             return result;
         }
 
-        return serialize_many(items...);
+        return serialize2_many(items...);
     }
 
-    ZPP_BITS_INLINE constexpr errc serialize_many()
+    ZPP_BITS_INLINE constexpr errc serialize2_many()
     {
         return {};
     }
@@ -2039,15 +2039,15 @@ protected:
         }
     }
 
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::unspecialized auto && item)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::unspecialized auto && item)
     {
         using type = std::remove_cvref_t<decltype(item)>;
         static_assert(!std::is_pointer_v<type>);
 
-        if constexpr (requires { type::serialize(*this, item); }) {
-            return type::serialize(*this, item);
-        } else if constexpr (requires { serialize(*this, item); }) {
-            return serialize(*this, item);
+        if constexpr (requires { type::serialize2(*this, item); }) {
+            return type::serialize2(*this, item);
+        } else if constexpr (requires { serialize2(*this, item); }) {
+            return serialize2(*this, item);
         } else if constexpr (std::is_fundamental_v<type> || std::is_enum_v<type>) {
             if constexpr (resizable) {
                 if (auto result = enlarge_for(sizeof(item));
@@ -2141,35 +2141,35 @@ protected:
             return {};
         } else if constexpr (concepts::empty<type>) {
             return {};
-        } else if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        } else if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                           type>) {
-            return serialize_one(as_bytes(item));
+            return serialize2_one(as_bytes(item));
         } else if constexpr (concepts::self_referencing<type>) {
             return visit_members(
                 item,
                 [&](auto &&... items) constexpr {
-                    return serialize_many(items...);
+                    return serialize2_many(items...);
                 });
         } else {
             return visit_members(
                 item,
                 [&](auto &&... items) ZPP_BITS_CONSTEXPR_INLINE_LAMBDA {
-                    return serialize_many(items...);
+                    return serialize2_many(items...);
                 });
         }
     }
 
     template <typename SizeType = default_size_type>
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::array auto && array)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::array auto && array)
     {
         using value_type = std::remove_cvref_t<decltype(array[0])>;
 
-        if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                    value_type>) {
-            return serialize_one(bytes(array));
+            return serialize2_one(bytes(array));
         } else {
             for (auto & item : array) {
-                if (auto result = serialize_one(item); failure(result))
+                if (auto result = serialize2_one(item); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2180,12 +2180,12 @@ protected:
 
     template <typename SizeType = default_size_type>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::container auto && container)
+    serialize2_one(concepts::container auto && container)
     {
         using type = std::remove_cvref_t<decltype(container)>;
         using value_type = typename type::value_type;
 
-        if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                    value_type> &&
                       std::is_base_of_v<std::random_access_iterator_tag,
                                         typename std::iterator_traits<
@@ -2210,12 +2210,12 @@ protected:
                                        has_fixed_nonzero_size<type>;
                                }))) {
                 if (auto result =
-                        serialize_one(static_cast<SizeType>(size));
+                        serialize2_one(static_cast<SizeType>(size));
                     failure(result)) [[unlikely]] {
                     return result;
                 }
             }
-            return serialize_one(bytes(container, size));
+            return serialize2_one(bytes(container, size));
         } else {
             if constexpr (!std::is_void_v<SizeType> &&
                           (concepts::associative_container<
@@ -2233,14 +2233,14 @@ protected:
                                    requires concepts::
                                        has_fixed_nonzero_size<type>;
                                }))) {
-                if (auto result = serialize_one(
+                if (auto result = serialize2_one(
                         static_cast<SizeType>(container.size()));
                     failure(result)) [[unlikely]] {
                     return result;
                 }
             }
             for (auto & item : container) {
-                if (auto result = serialize_one(item); failure(result))
+                if (auto result = serialize2_one(item); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2250,38 +2250,38 @@ protected:
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::tuple auto && tuple)
+    serialize2_one(concepts::tuple auto && tuple)
     {
-        return serialize_one(tuple,
+        return serialize2_one(tuple,
                              std::make_index_sequence<std::tuple_size_v<
                                  std::remove_cvref_t<decltype(tuple)>>>());
     }
 
     template <std::size_t... Indices>
-    ZPP_BITS_INLINE constexpr errc serialize_one(
+    ZPP_BITS_INLINE constexpr errc serialize2_one(
         concepts::tuple auto && tuple, std::index_sequence<Indices...>)
     {
-        return serialize_many(std::get<Indices>(tuple)...);
+        return serialize2_many(std::get<Indices>(tuple)...);
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::optional auto && optional)
+    serialize2_one(concepts::optional auto && optional)
     {
         if (!optional) [[unlikely]] {
-            return serialize_one(std::byte(false));
+            return serialize2_one(std::byte(false));
         } else {
-            return serialize_many(std::byte(true), *optional);
+            return serialize2_many(std::byte(true), *optional);
         }
     }
 
     template <typename KnownId = void>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::variant auto && variant)
+    serialize2_one(concepts::variant auto && variant)
     {
         using type = std::remove_cvref_t<decltype(variant)>;
 
         if constexpr (!std::is_void_v<KnownId>) {
-            return serialize_one(
+            return serialize2_one(
                 *std::get_if<
                     traits::variant<type>::template index<KnownId::value>()>(
                     std::addressof(variant)));
@@ -2294,7 +2294,7 @@ protected:
             return std::visit(
                 [index = variant_index,
                  this](auto & object) ZPP_BITS_CONSTEXPR_INLINE_LAMBDA {
-                    return this->serialize_many(
+                    return this->serialize2_many(
                         traits::variant<type>::id(index), object);
                 },
                 variant);
@@ -2302,17 +2302,17 @@ protected:
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::owning_pointer auto && pointer)
+    serialize2_one(concepts::owning_pointer auto && pointer)
     {
         if (nullptr == pointer) [[unlikely]] {
             return std::errc::invalid_argument;
         }
 
-        return serialize_one(*pointer);
+        return serialize2_one(*pointer);
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::bitset auto && bitset)
+    serialize2_one(concepts::bitset auto && bitset)
     {
         constexpr auto size = std::remove_cvref_t<decltype(bitset)>{}.size();
         constexpr auto size_in_bytes = (size + (CHAR_BIT - 1)) / CHAR_BIT;
@@ -2339,24 +2339,24 @@ protected:
     }
 
     template <typename SizeType = default_size_type>
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::by_protocol auto && item)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::by_protocol auto && item)
     {
         using type = std::remove_cvref_t<decltype(item)>;
         if constexpr (!std::is_void_v<SizeType>) {
             auto size_position = m_position;
-            if (auto result = serialize_one(SizeType{});
+            if (auto result = serialize2_one(SizeType{});
                 failure(result)) [[unlikely]] {
                 return result;
             }
 
-            if constexpr (requires { typename type::serialize; }) {
-                constexpr auto protocol = type::serialize::value;
+            if constexpr (requires { typename type::serialize2; }) {
+                constexpr auto protocol = type::serialize2::value;
                 if (auto result = protocol(*this, item); failure(result))
                     [[unlikely]] {
                     return result;
                 }
             } else {
-                constexpr auto protocol = decltype(serialize(item))::value;
+                constexpr auto protocol = decltype(serialize2(item))::value;
                 if (auto result = protocol(*this, item); failure(result))
                     [[unlikely]] {
                     return result;
@@ -2367,11 +2367,11 @@ protected:
             std::size_t message_size =
                     current_position - size_position - sizeof(SizeType);
             if constexpr (concepts::varint<SizeType>) {
-                constexpr auto preserialized_varint_size = 1;
+                constexpr auto preserialize2d_varint_size = 1;
                 message_size = current_position - size_position -
-                               preserialized_varint_size;
+                               preserialize2d_varint_size;
                 auto move_ahead_count =
-                    varint_size(message_size) - preserialized_varint_size;
+                    varint_size(message_size) - preserialize2d_varint_size;
                 if (move_ahead_count) {
                     if constexpr (resizable) {
                         if (auto result = enlarge_for(move_ahead_count);
@@ -2385,7 +2385,7 @@ protected:
                     }
                     auto data = m_data.data();
                     auto message_start =
-                        data + size_position + preserialized_varint_size;
+                        data + size_position + preserialize2d_varint_size;
                     auto message_end = data + current_position;
                     if (std::is_constant_evaluated()) {
                         for (auto p = message_end - 1; p >= message_start;
@@ -2405,11 +2405,11 @@ protected:
                     m_data.data() + size_position, sizeof(SizeType)}}(
                 SizeType(message_size));
         } else {
-            if constexpr (requires {typename type::serialize;}) {
-                constexpr auto protocol = type::serialize::value;
+            if constexpr (requires {typename type::serialize2;}) {
+                constexpr auto protocol = type::serialize2::value;
                 return protocol(*this, item);
             } else {
-                constexpr auto protocol = decltype(serialize(item))::value;
+                constexpr auto protocol = decltype(serialize2(item))::value;
                 return protocol(*this, item);
             }
         }
@@ -2445,18 +2445,18 @@ public:
         if constexpr (resizable && !no_fit_size &&
                       enlarger != std::tuple{1, 1}) {
             auto end = m_data.size();
-            auto result = serialize_many(items...);
+            auto result = serialize2_many(items...);
             if (m_position >= end) {
                 m_data.resize(m_position);
             }
             return result;
         } else {
-            return serialize_many(items...);
+            return serialize2_many(items...);
         }
     }
 
 private:
-    using base::serialize_many;
+    using base::serialize2_many;
     using base::m_data;
     using base::m_position;
 };
@@ -2531,7 +2531,7 @@ public:
 
     ZPP_BITS_INLINE constexpr auto operator()(auto &&... items)
     {
-        return serialize_many(items...);
+        return serialize2_many(items...);
     }
 
     constexpr decltype(auto) data()
@@ -2582,31 +2582,31 @@ public:
                                std::span{std::declval<ByteView &>()})>>;
 
 private:
-    ZPP_BITS_INLINE constexpr errc serialize_many(auto && first_item,
+    ZPP_BITS_INLINE constexpr errc serialize2_many(auto && first_item,
                                                   auto &&... items)
     {
-        if (auto result = serialize_one(first_item); failure(result))
+        if (auto result = serialize2_one(first_item); failure(result))
             [[unlikely]] {
             return result;
         }
 
-        return serialize_many(items...);
+        return serialize2_many(items...);
     }
 
-    ZPP_BITS_INLINE constexpr errc serialize_many()
+    ZPP_BITS_INLINE constexpr errc serialize2_many()
     {
         return {};
     }
 
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::unspecialized auto && item)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::unspecialized auto && item)
     {
         using type = std::remove_cvref_t<decltype(item)>;
         static_assert(!std::is_pointer_v<type>);
 
-        if constexpr (requires { type::serialize(*this, item); }) {
-            return type::serialize(*this, item);
-        } else if constexpr (requires { serialize(*this, item); }) {
-            return serialize(*this, item);
+        if constexpr (requires { type::serialize2(*this, item); }) {
+            return type::serialize2(*this, item);
+        } else if constexpr (requires { serialize2(*this, item); }) {
+            return serialize2(*this, item);
         } else if constexpr (std::is_fundamental_v<type> || std::is_enum_v<type>) {
             auto size = m_data.size();
             if (sizeof(item) > size - m_position) [[unlikely]] {
@@ -2685,35 +2685,35 @@ private:
             return {};
         } else if constexpr (concepts::empty<type>) {
             return {};
-        } else if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        } else if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                           type>) {
-            return serialize_one(as_bytes(item));
+            return serialize2_one(as_bytes(item));
         } else if constexpr (concepts::self_referencing<type>) {
             return visit_members(
                 item,
                 [&](auto &&... items) constexpr {
-                    return serialize_many(items...);
+                    return serialize2_many(items...);
                 });
         } else {
             return visit_members(
                 item,
                 [&](auto &&... items) ZPP_BITS_CONSTEXPR_INLINE_LAMBDA {
-                    return serialize_many(items...);
+                    return serialize2_many(items...);
                 });
         }
     }
 
     template <typename SizeType = default_size_type>
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::array auto && array)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::array auto && array)
     {
         using value_type = std::remove_cvref_t<decltype(array[0])>;
 
-        if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                    value_type>) {
-            return serialize_one(bytes(array));
+            return serialize2_one(bytes(array));
         } else {
             for (auto & item : array) {
-                if (auto result = serialize_one(item); failure(result))
+                if (auto result = serialize2_one(item); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2724,7 +2724,7 @@ private:
 
     template <typename SizeType = default_size_type>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::container auto && container)
+    serialize2_one(concepts::container auto && container)
     {
         using type = std::remove_cvref_t<decltype(container)>;
         using value_type = typename type::value_type;
@@ -2748,7 +2748,7 @@ private:
                                    type>;
                            }))) {
             SizeType size{};
-            if (auto result = serialize_one(size); failure(result))
+            if (auto result = serialize2_one(size); failure(result))
                 [[unlikely]] {
                 return result;
             }
@@ -2783,7 +2783,7 @@ private:
             }
 
             if constexpr (
-                concepts::serialize_as_bytes<decltype(*this),
+                concepts::serialize2_as_bytes<decltype(*this),
                                              value_type> &&
                 std::is_base_of_v<
                     std::random_access_iterator_tag,
@@ -2797,11 +2797,11 @@ private:
                                 value_type>)&&requires(type container) {
                       container = {m_data.data(), 1};
                   })) {
-                return serialize_one(bytes(container, size));
+                return serialize2_one(bytes(container, size));
             }
         }
 
-        if constexpr (concepts::serialize_as_bytes<decltype(*this),
+        if constexpr (concepts::serialize2_as_bytes<decltype(*this),
                                                    value_type> &&
                       std::is_base_of_v<std::random_access_iterator_tag,
                                         typename std::iterator_traits<
@@ -2835,11 +2835,11 @@ private:
                 }
                 return {};
             } else {
-                return serialize_one(bytes(container));
+                return serialize2_one(bytes(container));
             }
         } else {
             for (auto & item : container) {
-                if (auto result = serialize_one(item); failure(result))
+                if (auto result = serialize2_one(item); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2850,14 +2850,14 @@ private:
 
     template <typename SizeType = default_size_type>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::associative_container auto && container)
+    serialize2_one(concepts::associative_container auto && container)
     {
         using type = typename std::remove_cvref_t<decltype(container)>;
 
         SizeType size{};
 
         if constexpr (!std::is_void_v<SizeType>) {
-            if (auto result = serialize_one(size); failure(result))
+            if (auto result = serialize2_one(size); failure(result))
                 [[unlikely]] {
                 return result;
             }
@@ -2877,7 +2877,7 @@ private:
                 auto object = access::placement_new<value_type>(
                     std::addressof(storage));
                 destructor_guard guard{*object};
-                if (auto result = serialize_one(*object); failure(result))
+                if (auto result = serialize2_one(*object); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2891,7 +2891,7 @@ private:
                 auto object = access::placement_new<value_type>(
                     std::addressof(storage));
                 destructor_guard guard{*object};
-                if (auto result = serialize_one(*object); failure(result))
+                if (auto result = serialize2_one(*object); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -2904,27 +2904,27 @@ private:
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::tuple auto && tuple)
+    serialize2_one(concepts::tuple auto && tuple)
     {
-        return serialize_one(tuple,
+        return serialize2_one(tuple,
                              std::make_index_sequence<std::tuple_size_v<
                                  std::remove_cvref_t<decltype(tuple)>>>());
     }
 
     template <std::size_t... Indices>
-    ZPP_BITS_INLINE constexpr errc serialize_one(
+    ZPP_BITS_INLINE constexpr errc serialize2_one(
         concepts::tuple auto && tuple, std::index_sequence<Indices...>)
     {
-        return serialize_many(std::get<Indices>(tuple)...);
+        return serialize2_many(std::get<Indices>(tuple)...);
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::optional auto && optional)
+    serialize2_one(concepts::optional auto && optional)
     {
         using value_type = std::remove_reference_t<decltype(*optional)>;
 
         std::byte has_value{};
-        if (auto result = serialize_one(has_value); failure(result))
+        if (auto result = serialize2_one(has_value); failure(result))
             [[unlikely]] {
             return result;
         }
@@ -2939,7 +2939,7 @@ private:
                 optional = value_type{};
             }
 
-            if (auto result = serialize_one(*optional); failure(result))
+            if (auto result = serialize2_one(*optional); failure(result))
                 [[unlikely]] {
                 return result;
             }
@@ -2950,7 +2950,7 @@ private:
                 access::placement_new<value_type>(std::addressof(storage));
             destructor_guard guard{*object};
 
-            if (auto result = serialize_one(*object); failure(result))
+            if (auto result = serialize2_one(*object); failure(result))
                 [[unlikely]] {
                 return result;
             }
@@ -2966,7 +2966,7 @@ private:
               template <typename...>
               typename Variant>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(Variant<Types...> & variant) requires
+    serialize2_one(Variant<Types...> & variant) requires
         concepts::variant<Variant<Types...>>
     {
         using type = std::remove_cvref_t<decltype(variant)>;
@@ -2985,7 +2985,7 @@ private:
                         element_type>()) {
                     variant = element_type{};
                 }
-                return serialize_one(*std::get_if<element_type>(&variant));
+                return serialize2_one(*std::get_if<element_type>(&variant));
             } else {
                 alignas(element_type) std::byte storage[sizeof(element_type)];
 
@@ -2993,7 +2993,7 @@ private:
                     std::addressof(storage));
                 destructor_guard guard{*object};
 
-                if (auto result = serialize_one(*object); failure(result))
+                if (auto result = serialize2_one(*object); failure(result))
                     [[unlikely]] {
                     return result;
                 }
@@ -3001,18 +3001,18 @@ private:
             }
         } else {
             typename traits::variant<type>::id_type id;
-            if (auto result = serialize_one(id); failure(result))
+            if (auto result = serialize2_one(id); failure(result))
                 [[unlikely]] {
                 return result;
             }
 
-            return serialize_one(variant, id);
+            return serialize2_one(variant, id);
         }
     }
 
     template <typename... Types, template <typename...> typename Variant>
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(Variant<Types...> & variant,
+    serialize2_one(Variant<Types...> & variant,
                   auto && id) requires concepts::variant<Variant<Types...>>
     {
         using type = std::remove_cvref_t<decltype(variant)>;
@@ -3031,7 +3031,7 @@ private:
                             Types>()) {
                         variant = Types{};
                     }
-                    return self.serialize_one(
+                    return self.serialize2_one(
                         *std::get_if<Types>(&variant));
                 } else {
                     alignas(Types) std::byte storage[sizeof(Types)];
@@ -3040,7 +3040,7 @@ private:
                         std::addressof(storage));
                     destructor_guard guard{*object};
 
-                    if (auto result = self.serialize_one(*object);
+                    if (auto result = self.serialize2_one(*object);
                         failure(result)) [[unlikely]] {
                         return result;
                     }
@@ -3056,12 +3056,12 @@ private:
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::owning_pointer auto && pointer)
+    serialize2_one(concepts::owning_pointer auto && pointer)
     {
         using type = std::remove_reference_t<decltype(*pointer)>;
 
         auto loaded = access::make_unique<type>();;
-        if (auto result = serialize_one(*loaded); failure(result))
+        if (auto result = serialize2_one(*loaded); failure(result))
             [[unlikely]] {
             return result;
         }
@@ -3071,7 +3071,7 @@ private:
     }
 
     ZPP_BITS_INLINE constexpr errc
-    serialize_one(concepts::bitset auto && bitset)
+    serialize2_one(concepts::bitset auto && bitset)
     {
         constexpr auto size = std::remove_cvref_t<decltype(bitset)>{}.size();
         constexpr auto size_in_bytes = (size + (CHAR_BIT - 1)) / CHAR_BIT;
@@ -3093,29 +3093,29 @@ private:
     }
 
     template <typename SizeType = default_size_type>
-    ZPP_BITS_INLINE constexpr errc serialize_one(concepts::by_protocol auto && item)
+    ZPP_BITS_INLINE constexpr errc serialize2_one(concepts::by_protocol auto && item)
     {
         using type = std::remove_cvref_t<decltype(item)>;
         if constexpr (!std::is_void_v<SizeType>) {
             SizeType size{};
-            if (auto result = serialize_one(size); failure(result))
+            if (auto result = serialize2_one(size); failure(result))
                 [[unlikely]] {
                 return result;
             }
 
-            if constexpr (requires {typename type::serialize;}) {
-                constexpr auto protocol = type::serialize::value;
+            if constexpr (requires {typename type::serialize2;}) {
+                constexpr auto protocol = type::serialize2::value;
                 return protocol(*this, item, size);
             } else {
-                constexpr auto protocol = decltype(serialize(item))::value;
+                constexpr auto protocol = decltype(serialize2(item))::value;
                 return protocol(*this, item, size);
             }
         } else {
-            if constexpr (requires {typename type::serialize;}) {
-                constexpr auto protocol = type::serialize::value;
+            if constexpr (requires {typename type::serialize2;}) {
+                constexpr auto protocol = type::serialize2::value;
                 return protocol(*this, item);
             } else {
-                constexpr auto protocol = decltype(serialize(item))::value;
+                constexpr auto protocol = decltype(serialize2(item))::value;
                 return protocol(*this, item);
             }
         }
@@ -3281,24 +3281,24 @@ constexpr auto from_bytes() requires (sizeof...(Types) > 1)
 }
 
 template <auto Id, auto MaxSize = -1>
-constexpr auto serialize_id()
+constexpr auto serialize2_id()
 {
-    constexpr auto serialized_id = slice<0, MaxSize>(to_bytes<Id>());
-    if constexpr (sizeof(serialized_id) == 1) {
-        return serialization_id<from_bytes<serialized_id, std::byte>()>{};
-    } else if constexpr (sizeof(serialized_id) == 2) {
-        return serialization_id<from_bytes<serialized_id, std::uint16_t>()>{};
-    } else if constexpr (sizeof(serialized_id) == 4) {
-        return serialization_id<from_bytes<serialized_id, std::uint32_t>()>{};
-    } else if constexpr (sizeof(serialized_id) == 8) {
-        return serialization_id<from_bytes<serialized_id, std::uint64_t>()>{};
+    constexpr auto serialize2d_id = slice<0, MaxSize>(to_bytes<Id>());
+    if constexpr (sizeof(serialize2d_id) == 1) {
+        return serialization_id<from_bytes<serialize2d_id, std::byte>()>{};
+    } else if constexpr (sizeof(serialize2d_id) == 2) {
+        return serialization_id<from_bytes<serialize2d_id, std::uint16_t>()>{};
+    } else if constexpr (sizeof(serialize2d_id) == 4) {
+        return serialization_id<from_bytes<serialize2d_id, std::uint32_t>()>{};
+    } else if constexpr (sizeof(serialize2d_id) == 8) {
+        return serialization_id<from_bytes<serialize2d_id, std::uint64_t>()>{};
     } else {
-        return serialization_id<serialized_id>{};
+        return serialization_id<serialize2d_id>{};
     }
 }
 
 template <auto Id, auto MaxSize = -1>
-using id = decltype(serialize_id<Id, MaxSize>());
+using id = decltype(serialize2_id<Id, MaxSize>());
 
 template <auto Id, auto MaxSize = -1>
 constexpr auto id_v = id<Id, MaxSize>::value;
@@ -3311,10 +3311,10 @@ struct known_id_variant
     {
     }
 
-    ZPP_BITS_INLINE constexpr static auto serialize(auto & serializer,
+    ZPP_BITS_INLINE constexpr static auto serialize2(auto & serialize2r,
                                                     auto & self)
     {
-        return serializer.template serialize_one<Id>(self.variant);
+        return serialize2r.template serialize2_one<Id>(self.variant);
     }
 
     Variant & variant;
@@ -3342,10 +3342,10 @@ struct known_dynamic_id_variant
     {
     }
 
-    ZPP_BITS_INLINE constexpr static auto serialize(auto & serializer,
+    ZPP_BITS_INLINE constexpr static auto serialize2(auto & serialize2r,
                                                     auto & self)
     {
-        return serializer.serialize_one(self.variant, self.id);
+        return serialize2r.serialize2_one(self.variant, self.id);
     }
 
     Variant & variant;
@@ -4717,7 +4717,7 @@ struct pb
                     item,
                     [&](auto &&... items) constexpr {
                         static_assert((... && check_type<decltype(items)>()));
-                        return serialize_many(
+                        return serialize2_many(
                             std::make_index_sequence<sizeof...(items)>{},
                             out,
                             items...);
@@ -4729,7 +4729,7 @@ struct pb
                     item,
                     [&](auto &&... items) ZPP_BITS_CONSTEXPR_INLINE_LAMBDA {
                         static_assert((... && check_type<decltype(items)>()));
-                        return serialize_many(
+                        return serialize2_many(
                             std::make_index_sequence<sizeof...(items)>{},
                             out,
                             items...);
@@ -4742,7 +4742,7 @@ struct pb
                 item,
                 [&](auto &&... items) constexpr {
                     static_assert((... && check_type<decltype(items)>()));
-                    return serialize_many(
+                    return serialize2_many(
                         std::make_index_sequence<sizeof...(items)>{},
                         archive,
                         items...);
@@ -4752,7 +4752,7 @@ struct pb
                 item,
                 [&](auto &&... items) ZPP_BITS_CONSTEXPR_INLINE_LAMBDA {
                     static_assert((... && check_type<decltype(items)>()));
-                    return serialize_many(
+                    return serialize2_many(
                         std::make_index_sequence<sizeof...(items)>{},
                         archive,
                         items...);
@@ -4761,24 +4761,24 @@ struct pb
     }
 
     template <std::size_t FirstIndex, std::size_t... Indices>
-    ZPP_BITS_INLINE constexpr static auto serialize_many(
+    ZPP_BITS_INLINE constexpr static auto serialize2_many(
         std::index_sequence<FirstIndex, Indices...>,
         auto & archive,
         auto & first_item,
         auto &... items) requires(std::remove_cvref_t<decltype(archive)>::
                                       kind() == kind::out)
     {
-        if (auto result = serialize_one<FirstIndex>(archive, first_item);
+        if (auto result = serialize2_one<FirstIndex>(archive, first_item);
             failure(result)) [[unlikely]] {
             return result;
         }
 
-        return serialize_many(
+        return serialize2_many(
             std::index_sequence<Indices...>{}, archive, items...);
     }
 
     ZPP_BITS_INLINE constexpr static errc
-    serialize_many(std::index_sequence<>, auto & archive) requires(
+    serialize2_many(std::index_sequence<>, auto & archive) requires(
         std::remove_cvref_t<decltype(archive)>::kind() == kind::out)
     {
         return {};
@@ -4786,7 +4786,7 @@ struct pb
 
     template <std::size_t Index, typename TagType = void>
     ZPP_BITS_INLINE constexpr static errc
-    serialize_one(auto & archive, auto & item) requires(
+    serialize2_one(auto & archive, auto & item) requires(
         std::remove_cvref_t<decltype(archive)>::kind() == kind::out)
     {
         using type = std::remove_cvref_t<decltype(item)>;
@@ -4795,7 +4795,7 @@ struct pb
         if constexpr (concepts::empty<type>) {
             return {};
         } else if constexpr (is_pb_field<type>()) {
-            return serialize_one<Index, tag_type>(
+            return serialize2_one<Index, tag_type>(
                 archive,
                 static_cast<const typename type::pb_field_type &>(item));
         } else if constexpr (std::is_enum_v<type> &&
@@ -4835,8 +4835,8 @@ struct pb
                 const key_type & key;
                 const mapped_type & value;
 
-                using serialize = protocol<pb_default{}>;
-                serialize use();
+                using serialize2 = protocol<pb_default{}>;
+                serialize2 use();
             };
 
             for (auto & [key, value] : item) {
@@ -4939,13 +4939,13 @@ struct pb
               endian::little{},
               alloc_limit<std::remove_cvref_t<
                   decltype(archive)>::allocation_limit>{}};
-        auto result = deserialize_fields(in, item);
+        auto result = deserialize2_fields(in, item);
         archive.position() += in.position();
         return result;
     }
 
     ZPP_BITS_INLINE constexpr static errc
-    deserialize_fields(auto & archive, auto & item)
+    deserialize2_fields(auto & archive, auto & item)
     {
         using type = std::remove_cvref_t<decltype(item)>;
         static_assert(check_type<type>());
@@ -4972,7 +4972,7 @@ struct pb
                 return result;
             }
 
-            if (auto result = deserialize_field(
+            if (auto result = deserialize2_field(
                     archive, item, tag_number(tag), tag_type(tag));
                 failure(result)) [[unlikely]] {
                 return result;
@@ -4984,7 +4984,7 @@ struct pb
 
     template <std::size_t Index = 0>
     ZPP_BITS_INLINE constexpr static auto
-    deserialize_field(auto & archive,
+    deserialize2_field(auto & archive,
                       auto && item,
                       auto field_num,
                       wire_type field_type)
@@ -4996,7 +4996,7 @@ struct pb
             }
             return errc{};
         } else if (field_number_from_struct<type, Index>() != field_num) {
-            return deserialize_field<Index + 1>(
+            return deserialize2_field<Index + 1>(
                 archive, item, field_num, field_type);
         } else if constexpr (concepts::self_referencing<type>) {
             return visit_members(
@@ -5007,7 +5007,7 @@ struct pb
                     using type = std::remove_reference_t<decltype(item)>;
                     static_assert(check_type<type>());
 
-                    return deserialize_field(archive, field_type, item);
+                    return deserialize2_field(archive, field_type, item);
                 });
         } else {
             return visit_members(
@@ -5018,12 +5018,12 @@ struct pb
                     using type = std::remove_reference_t<decltype(item)>;
                     static_assert(check_type<type>());
 
-                    return deserialize_field(archive, field_type, item);
+                    return deserialize2_field(archive, field_type, item);
                 });
         }
     }
 
-    ZPP_BITS_INLINE constexpr static auto deserialize_field(
+    ZPP_BITS_INLINE constexpr static auto deserialize2_field(
         auto & archive, wire_type field_type, auto & item)
     {
         using type = std::remove_reference_t<decltype(item)>;
@@ -5039,7 +5039,7 @@ struct pb
             item = value;
             return errc{};
         } else if constexpr (is_pb_field<type>()) {
-            return deserialize_field(
+            return deserialize2_field(
                 archive,
                 field_type,
                 static_cast<typename type::pb_field_type &>(item));
@@ -5064,8 +5064,8 @@ struct pb
                 key_type key;
                 mapped_type value;
 
-                using serialize = protocol<pb_default{}>;
-                serialize use();
+                using serialize2 = protocol<pb_default{}>;
+                serialize2 use();
             };
 
             alignas(value_type) std::byte storage[sizeof(value_type)];
@@ -5309,7 +5309,7 @@ struct big_endian
     constexpr auto friend operator<=>(big_endian left,
                                       big_endian right) = default;
 
-    using serialize = members<1>;
+    using serialize2 = members<1>;
 
     Type value{};
 };
